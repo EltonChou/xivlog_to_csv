@@ -76,7 +76,6 @@ def dump_json_to_csv(timeline, name):
     df = pd.DataFrame(timeline)
     df = df[['time', 'damage']]
     df.to_csv("./output/{filename}.csv".format(filename=name))
-    print('Done!')
 
 def generate_filename(source):
     name = str(source.get('name'))
