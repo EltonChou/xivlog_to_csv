@@ -13,14 +13,13 @@ FIGHT_TABLE = 'https://www.fflogs.com/reports/fights-and-participants/{id}/0'
 DAMAGE_DONE = "https://www.fflogs.com/reports/graph/{table_type}/{log_id}/{fight}/{start_time}/{end_time}/source/0/0/0/0/0/0/-1.0.-1/0/Any/Any/0/0"
 
 def header():
-    bar = "=========================================================================================="
+    bar = "==========================================================="
     header = r"""
-____________________                  _____            _______________                    
-___  _____  _____  _____________ _    __  /______      ___  _____  __________________   __
-__  /_ __  /_ __  /_  __ __  __ `/    _  ___  __ \     __  /_ __  /_ _  _____  _____ | / /
-_  __/ _  __/ _  / / /_/ _  /_/ /     / /_ / /_/ /     _  __/ _  __/ / /__ _(__  )__ |/ / 
-/_/    /_/    /_/  \____/_\__, /      \__/ \____/      /_/    /_/    \___/ /____/ _____/  
-                         /____/                                                           
+       ________            __         ______           
+      / _/ _/ /__  ___ _  / /____    / _/ _/_______  __
+     / _/ _/ / _ \/ _ `/ / __/ _ \  / _/ _/ __(_-< |/ /
+    /_//_//_/\___/\_, /  \__/\___/ /_//_/ \__/___/___/ 
+                 /___/                                           
 """
     print(bar)
     print(header)
@@ -54,12 +53,14 @@ def fetch_damage_done_json_from(log_info):
     return damage_done
 
 def print_source_option(damage_donw_json):
-    bar()
+    cls()
+    header()
+    print("Choose the source you want to export.", end="\n\n")
     template = "{index} => {name}"
     for index, data in enumerate(damage_donw_json['series']):
         print(template.format(index=index, name=data['name']))
+    print("x => Back to top")
     bar()
-    print()
 
 def generate_damage_timeline_in_json_by(source):
     data = source['data']
@@ -75,25 +76,41 @@ def dump_json_to_csv(timeline, name):
     df = pd.DataFrame(timeline)
     df = df[['time', 'damage']]
     df.to_csv("./output/{filename}.csv".format(filename=name))
+    print('Done!')
 
 def generate_filename(source):
     name = str(source.get('name'))
     return name.replace(" ", "_")
 
+def cls():
+    os.system('cls' if os.name=='nt' else 'clear')
+
 def main():
+    NOTICE = "Enter fflogs id or \"x\" to exit."
     while True:
-        print("Enter fflogs url or \"x\" to exit.")
-        log_url = input("LOG ID:")
+        cls()
+        header()
+        print(NOTICE)
+        log_url = input("Log id: ")
         if log_url is "x":
             os._exit(0)
-        log_info = generate_log_info_from(log_url)
+        try:
+            log_info = generate_log_info_from(log_url)
+        except AttributeError:
+            NOTICE = "Can't find the log, Please check the ID again."
+            continue
         damage_done = fetch_damage_done_json_from(log_info)
+
         print_source_option(damage_done)
-        source_index = input("Source Index:")
+        source_index = input("Source index:")
+        if source_index is "x":
+            NOTICE = "Enter fflogs id or \"x\" to exit."
+            continue
+
         source = damage_done['series'][int(source_index)]
         time_line_json = generate_damage_timeline_in_json_by(source)
         dump_json_to_csv(time_line_json, generate_filename(source))
+        NOTICE = "DONE!"
 
 if __name__ == "__main__":
-    header()
     main()
