@@ -2,6 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.vs/
+.vscode/
+logtocsv/
+output/*
 
 # C extensions
 *.so
