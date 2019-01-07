@@ -33,7 +33,7 @@ def generate_log_info_from(log_url):
     id_regex = re.compile(r"(?<=reports\/)[a-zA-Z\d]*(?=#)")
     fight_regex = re.compile(r"(?<=fight=).*[\d]")
     type_regex = re.compile(r"(?<=type=).*[a-zA-Z]")
-    info_id = id_regex.search(log_url).group()
+    info_id = id_regex.match(log_url).group()
     info_temp = log_url.split("#")[1].split("&")
     info['id'] = info_id
     for i in info_temp:
@@ -98,17 +98,21 @@ def main():
         cls()
         header()
         print(NOTICE)
+
         log_url = input("Log id: ")
         if log_url is "x":
             os._exit(0)
+
         try:
             log_info = generate_log_info_from(log_url)
         except AttributeError:
             NOTICE = "Can't find the log, Please check the ID again."
             continue
+
         damage_done = fetch_damage_done_json_from(log_info)
 
         print_source_option(damage_done)
+
         source_index = input("Source index:")
         if source_index is "x":
             NOTICE = "Enter fflogs id or \"x\" to exit."
