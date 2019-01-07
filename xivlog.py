@@ -31,6 +31,8 @@ def bar():
 def generate_log_info_from(log_url):
     info = {}
     id_regex = re.compile(r"(?<=reports\/)[a-zA-Z\d]*(?=#)")
+    fight_regex = re.compile(r"(?<=fight=).*[\d]")
+    type_regex = re.compile(r"(?<=type=).*[a-zA-Z]")
     info_id = id_regex.search(log_url).group()
     info_temp = log_url.split("#")[1].split("&")
     info['id'] = info_id
@@ -51,6 +53,10 @@ def fetch_damage_done_json_from(log_info):
         start_time=start_time,
         end_time=end_time)).json()
     return damage_done
+
+def print_fight_option(fights):
+    
+    pass
 
 def print_source_option(damage_donw_json):
     cls()
@@ -75,6 +81,8 @@ def generate_damage_timeline_in_json_by(source):
 def dump_json_to_csv(timeline, name):
     df = pd.DataFrame(timeline)
     df = df[['time', 'damage']]
+    if not os.path.exists("./output"):
+        os.system("mkdir output")
     df.to_csv("./output/{filename}.csv".format(filename=name))
 
 def generate_filename(source):
